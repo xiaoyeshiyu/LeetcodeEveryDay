@@ -1,0 +1,84 @@
+**题目解析：**
+
+先考虑一路加速可以到达目标地点的情况，由于是一路加速，如果能够到达，那么一定是最短指令
+
+速度变化：1->2->4->8->16...
+
+对速度进行积分就是路程，观察上述是一个公比为2的等比数列，根据等比数列求和公式，可以得到：
+$$
+S(k) = 2^k - 1
+$$
+
+> 我们可以采用位运算的方法提前判断是一下能否直接加速到达，如果可以直接返回对应次数k。
+
+我们定义`dp[i]`表示：到达位置i所需的最少指令数量。
+
+然后我们考虑一下加速k次后到达$S(k)$的情况：
+
+- 情况1:$i == S(k)$
+
+  - 根据上述分析，不断加速到达某个$S(k)$所需的指令数量最少,则`dp[i] = k`
+- 情况2:$i < S(k)$，考虑如何到达目标点，如下图所示：
+
+  ![image-20221222162146418.png](https://pic.leetcode.cn/1671697400-BETfYS-image-20221222162146418.png)
+
+  将S(k)掉头后退的过程看成一个子问题，将当前位置看成原点，然后到达目标位置`tt = S(k) - i`的最少指令数，即`dp[S(k) - i]`，则状态转移方程为：
+  $$
+  dp[i] = k + 1 + dp[S(k) - i]
+  $$
+
+- 情况3:$S(k+1) > i > S(k)$，考虑此时如何到达目标，如果继续加速则会超过目标点i，则变成了情况2的状态，因此我们只能先掉头后退，再加速到达目标点，如下图所示：
+  ![image-20221222162139021.png](https://pic.leetcode.cn/1671697428-oYwcho-image-20221222162139021.png)
+
+  我们枚举调转车头后反向加速的次数back「back < k，因为如果大于等于k，则没必要开始就加速了」，可以得到某个位置$S(k) - S(back)$，然后将从此位置到达目标位置看成一个子问题，进行状态转移，转移方程为：
+  $$
+  dp[i] = k + 2 + back + dp[i - S(k) + S(back)]
+  $$
+
+* cpp
+
+```cpp
+class Solution {
+public:
+    bool check(int x){ // 其实就是判断1的个数
+        int cnt = 0;
+        while(x != 0){
+            x = x & (x - 1);
+            cnt += 1;
+        }
+        return cnt == 1;
+    }
+    int racecar(int target) {
+        // 通过简单位运算先判断是否直接加速就能到达
+        if(check(target + 1)){
+            int cnt = 0;
+            while(target != 0){
+                target >>= 1;
+                cnt ++;
+            }
+            return cnt;
+        }
+        vector<int> dp(target+1,INT_MAX);
+        for(int i = 1;i <= target;i++){
+            // 先加速k次走到S(k)
+            for(int k = 1; (1 << k) - 1 < 2 * i;k++){
+                int S_k = (1 << k) - 1; // 当前S(k)
+                if(S_k == i){ // 加速直达 情况1
+                    dp[i] = k;
+                }else if(S_k > i){ // 情况2
+                    dp[i] = min(dp[i],k + 1 + dp[S_k - i]);
+                }else{ // 情况3
+                    // 枚举往回加速走back次
+                    for(int back = 0; back < k;back++){
+                        int bS_k =  (1 << back) - 1; // 反向走的距离
+                        dp[i] = min(dp[i],k + 2 + back + dp[i - S_k + bS_k]);
+                    }
+                }
+            }
+        }
+
+        return dp[target];
+    }
+};
+```
+

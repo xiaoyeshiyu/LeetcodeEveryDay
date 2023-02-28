@@ -1,0 +1,80 @@
+> Problem: [312. 戳气球](https://leetcode.cn/problems/burst-balloons/description/)
+> 二刷笔记：
+
+![image-20221216114453356.png](https://pic.leetcode.cn/1671162384-hHchtx-image-20221216114453356.png)
+
+* go
+
+```go
+func maxCoins(nums []int) int {
+    n := len(nums)
+    if n == 1{
+        return nums[0]
+    }else if n == 2{
+        return max(nums[1],nums[0]) + nums[0] * nums[1]
+    }
+    dp := make([][]int,n)
+    for i := 0;i < n;i++{
+        dp[i] = make([]int,n)
+    }
+    for i := n-1;i >= 0;i--{
+        for j := i;j < n;j++{
+            lv,lr := 1,1
+            if i > 0{
+                lv = nums[i-1]
+            }
+            if j < n-1{
+                lr = nums[j+1]
+            }
+            for k := i;k <= j;k++{
+                if k == 0{
+                    dp[i][j] = max(dp[i][j],dp[k+1][j] + nums[k] * lv * lr)
+                }else if k == n-1{
+                    dp[i][j] = max(dp[i][j],dp[i][k-1] + nums[k] * lv * lr) 
+                }else{
+                    dp[i][j] = max(dp[i][j],dp[i][k-1] + dp[k+1][j] + nums[k] * lv * lr) 
+                }
+            }
+        }
+    }
+
+    return dp[0][n-1]
+}
+
+func max(x,y int)int{
+    if x >= y{
+        return x
+    }
+    return y
+}
+```
+
+优化：上面的边界问题太多了
+
+![image-20221216114518153.png](https://pic.leetcode.cn/1671162398-aYxWVI-image-20221216114518153.png)
+
+* cpp
+
+```cpp
+class Solution {
+public:
+    int maxCoins(vector<int>& nums) {
+        int n = nums.size();
+        // 头尾添加两个分数为1的气球
+        vector<int> v(n+2,1);
+        for(int i = 1;i <=n;i++){
+            v[i] = nums[i-1];
+        }
+        vector<vector<int>> dp(n+2,vector<int>(n+2,0)); // dp[k][k] 相当于从一个空的区间戳气球，因此也是等于0的
+        for(int i = n+1;i >= 0;i--){
+            for(int j = i;j <= n+1;j++){
+                for(int k = i+1;k <= j-1;k++){
+                    dp[i][j] = max(dp[i][j],dp[i][k] + dp[k][j] + v[i] * v[k] * v[j]);
+                }
+            }
+        }
+        return dp[0][n+1];
+    }
+};
+```
+

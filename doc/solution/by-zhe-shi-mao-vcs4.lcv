@@ -1,0 +1,42 @@
+* cpp
+
+```cpp
+class Solution {
+public:
+    int countSubstrings(string s) {
+        int n = s.size();
+        int ans = 0;
+
+        // state
+        vector<vector<bool>> dp(n, vector<bool>(n ,false));
+
+        // initialize
+        // 长度为 1 的子序列
+        for (int i = 0; i < n; ++i) {
+            dp[i][i] = true;
+            ++ans;
+        }
+        // 长度为 2 的子序列
+        for (int i = 0, j = 1; j < n; ++i, ++j) {
+            dp[i][j] = s[i] == s[j];
+            if (dp[i][j]) {
+                ++ans;
+            }
+        }
+
+        // function
+        // 长度为 n 的子序列判断
+        for (int l = 3; l <= n; ++l) {
+            for (int i = 0, j = i + l - 1; j < n; ++i, ++j) {
+                dp[i][j] = s[i] == s[j] && dp[i + 1][j - 1];
+                if (dp[i][j]) {
+                    ++ans;
+                }
+            }
+        }
+        
+        return ans;
+    }
+};
+```
+
