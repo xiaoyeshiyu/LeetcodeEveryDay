@@ -43,28 +43,25 @@ package main
 
 // leetcode submit region begin(Prohibit modification and deletion)
 func checkPalindromeFormation(a, b string) bool {
-	return checkConcatenation(a, b) || checkConcatenation(b, a)
+	return checkPalindrome(a, b) || checkPalindrome(b, a)
 }
 
-func checkConcatenation(a, b string) bool {
-	left, right := 0, len(a)-1
-	for left < right && a[left] == b[right] {
-		left++
-		right--
+func checkPalindrome(a, b string) bool {
+	for i := 0; i < len(a)>>1; i++ {
+		if a[i] != b[len(a)-1-i] {
+			return isPalindrome(b[i : len(a)-i]) || isPalindrome(a[i : len(a)-i])
+		}
 	}
-	if left >= right {
-		return true
-	}
-	return checkSelfPalindrome(a[left:right+1]) || checkSelfPalindrome(b[left:right+1])
+	return true
 }
 
-func checkSelfPalindrome(s string) bool {
-	left, right := 0, len(s)-1
-	for left < right && s[left] == s[right] {
-		left++
-		right--
+func isPalindrome(a string) bool {
+	for i := 0; i < len(a)>>1; i++ {
+		if a[i] != a[len(a)-1-i] {
+			return false
+		}
 	}
-	return left >= right
+	return true
 }
 
 //leetcode submit region end(Prohibit modification and deletion)

@@ -79,29 +79,35 @@ package main
 
 // leetcode submit region begin(Prohibit modification and deletion)
 func findLexSmallestString(s string, a int, b int) string {
-	q := []string{s}
-	vis := map[string]bool{s: true}
-	ans := s
-	n := len(s)
-	for len(q) > 0 {
-		s = q[0]
-		q = q[1:]
-		if ans > s {
-			ans = s
+	all := map[string]bool{s: true}
+	stack := []string{s}
+	res := s
+	for len(stack) > 0 {
+		// 出栈
+		s = stack[0]
+		stack = stack[1:]
+		// 比较
+		if s < res {
+			res = s
 		}
-		t1 := []byte(s)
-		for i := 1; i < n; i += 2 {
-			t1[i] = byte((int(t1[i]-'0')+a)%10 + '0')
+
+		// 转换
+		ss := []byte(s)
+		s = s[len(s)-b:] + s[:len(s)-b]
+		if !all[s] {
+			all[s] = true
+			stack = append(stack,s)
 		}
-		t2 := s[n-b:] + s[:n-b]
-		for _, t := range []string{string(t1), t2} {
-			if !vis[t] {
-				vis[t] = true
-				q = append(q, t)
-			}
+		// 累加
+		for i := 1; i < len(ss); i += 2 {
+			ss[i] = byte((int(ss[i]-'0')+a)%10) + '0'
+		}
+		if !all[string(ss)] {
+			all[string(ss)] = true
+			stack = append(stack,string(ss))
 		}
 	}
-	return ans
+	return res
 }
 
 //leetcode submit region end(Prohibit modification and deletion)
