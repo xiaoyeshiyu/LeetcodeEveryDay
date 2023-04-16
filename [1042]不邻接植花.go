@@ -54,27 +54,35 @@ package main
 
 //leetcode submit region begin(Prohibit modification and deletion)
 func gardenNoAdj(n int, paths [][]int) []int {
-	adj := make([][]int, n)
-	for i := 0; i < n; i++ {
-		adj[i] = []int{}
+	path := make([][]int,n)
+	for i := 0; i < len(paths); i++ {
+		path[paths[i][0]-1] = append(path[paths[i][0]-1], paths[i][1]-1)
+		path[paths[i][1]-1] = append(path[paths[i][1]-1], paths[i][0]-1)
 	}
-	for _, path := range paths {
-		adj[path[0]-1] = append(adj[path[0]-1], path[1]-1)
-		adj[path[1]-1] = append(adj[path[1]-1], path[0]-1)
-	}
-	ans := make([]int, n)
-	for i := 0; i < n; i++ {
-		colored := make([]bool, 5)
-		for _, vertex := range adj[i] {
-			colored[ans[vertex]] = true
+
+	//fmt.Println(path)
+
+	ans := make([]int,n)
+	var dfs func(i int)
+	dfs = func(i int) {
+		neighbors := path[i]
+		var allColor int
+		for _, neighbor := range neighbors {
+			allColor |= 1 << ans[neighbor]
 		}
-		for j := 1; j <= 4; j++ {
-			if !colored[j] {
+		//fmt.Println(ans)
+		for j := 1; j < 5; j++ {
+			if allColor & (1 << j) == 0 && i < n{
 				ans[i] = j
-				break
+				return
 			}
 		}
 	}
+
+	for i := 0; i < n; i++ {
+		dfs(i)
+	}
+
 	return ans
 }
 
