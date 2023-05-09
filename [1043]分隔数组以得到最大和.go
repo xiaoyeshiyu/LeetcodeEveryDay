@@ -8,7 +8,7 @@
 //
 // 
 //输入：arr = [1,15,7,9,2,5,10], k = 3
-//输出：84
+//输出：84\]wq
 //解释：数组变为 [15,15,15,9,10,10,10] 
 //
 // 示例 2： 
@@ -40,18 +40,20 @@ package main
 
 //leetcode submit region begin(Prohibit modification and deletion)
 func maxSumAfterPartitioning(arr []int, k int) int {
-	n := len(arr)
-	d := make([]int, n+1)
-	for i := 1; i <= n; i++ {
-		maxValue := arr[i-1]
-		for j := i - 1; j >= max(0, i - k); j-- {
-			d[i] = max(d[i], d[j] + maxValue * (i - j))
-			if j > 0 && arr[j - 1] > maxValue {
-				maxValue = arr[j - 1]
-			}
+	l := len(arr)
+	// 使用DP，代表当数组长度为i时，元素最大和
+	dp := make([]int,l+1)
+	//  便利数组长度
+	for i := 1; i <= l; i++ {
+		tmpMax := arr[i-1]
+		dp[i] =  dp[i-1] + arr[i-1]
+		// 便利子数组长度，从0到k
+		for j := 1; j < k && i-j > 0 ; j++ {
+			tmpMax = max(tmpMax,arr[i-j-1])
+			dp[i] = max(dp[i],dp[i-j-1] + tmpMax*(j+1))
 		}
 	}
-	return d[n]
+	return dp[l]
 }
 
 func max(x, y int) int {

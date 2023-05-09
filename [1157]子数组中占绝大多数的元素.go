@@ -44,7 +44,9 @@
 // Related Topics 设计 树状数组 线段树 数组 二分查找 👍 83 👎 0
 package main
 
-import "math"
+import "math/rand"
+import "time"
+import "sort"
 
 //leetcode submit region begin(Prohibit modification and deletion)
 type MajorityChecker struct {
@@ -54,7 +56,7 @@ type MajorityChecker struct {
 
 func Constructor(arr []int) MajorityChecker {
 	rand.Seed(time.Now().UnixNano())
-	loc := map[int][]int{}
+	loc := make(map[int][]int,len(arr))
 	for i, x := range arr {
 		loc[x] = append(loc[x], i)
 	}
