@@ -31,6 +31,9 @@ package main
 
 import "math"
 
+// (a + b) % c = (a % c + b % c) % c
+// (a * b) % c = ((a % c) * (b % c)) % c
+
 // leetcode submit region begin(Prohibit modification and deletion)
 func smallestRepunitDivByK(k int) int {
 	if k % 2 == 0 || k % 5 == 0 {
